@@ -1,0 +1,86 @@
+# This file contains the parameters of the simulation
+% It is split in 2 blocks:
+%       - Model which deals with the voxel parameter, the contrast agent and simulation paramters
+%       - Seq   which deals with the MR sequence played on top of the voxel
+%
+% Each line which starts by Model. or Seq. will be read by VoxelSim.m
+
+####################
+##      Model     ##
+####################
+
+Model.Project		=   0;	  	% Project name (0: vascular project, 1: red blood cell project)
+Model.Shape		=   0;    	% Shape of RBCs/vessels (0: circles, 1: ellipses)
+Model.Flag.verbose      =   1;          % Display verbal information
+Model.Flag.display      =   1;          % Display verbal information
+Model.Flag.B0Ori3D      =   1;          % 1: Mag field is averaged over 3 orthogonal direction, 0: B0 is in plane
+Model.Flag.SaveGeo      =   0;          % Save/Load geometry
+
+Model.dt                =   0.5e-3;     % (s)
+Model.Tmax              =   10;         % Final time of the simulation (s)
+
+%% Geometry
+Model.geo.res           =   128;        % Dimension of the lattice
+Model.geo.path          =   pwd;        % Path where geometry are save/load
+Model.geo.vasc.Id       =   1;          % Id # of vascular geometry
+Model.geo.vasc.vp       =   0.03;       % Blood volume fraction
+Model.geo.vasc.R        =   3e-6;       % (m) Radius of the vessels
+Model.geo.vasc.R2       =   1.25e-6;    % (m) Radius of the vessels
+Model.geo.vasc.Inter    =   10e-6;      % (m) Interspace between vessels (-1 generates a cartesian grid if number of vessel is squared)
+Model.geo.vasc.wallw    =   1e-6;       % (m) size of the periphery of the vessels
+Model.geo.vasc.N        =   5;          % Number of vessels
+Model.geo.cell.Id       =   1;          % Id # of the cell geometry (linked to vascular geometry index)
+Model.geo.cell.Rc       =   10e-6;      % (m) Radius maximum of the cells
+Model.geo.cell.Inter    =   0.2e-6;     % (m) Interspace between cells and cell-vessel
+Model.geo.cell.Poro     =   1;          % Fraction of the ees: (ees volume) / (total volume)
+
+%% Physic/Physio param
+Model.phy.B0            =   4.7;        % Static Magnetic Field (T)
+Model.phy.DH2O          =   1000e-12;   % (m2/s)
+
+Model.phy.M0.vasc       =   1;          % Proton concentration
+Model.phy.M0.cell       =   1;          %
+Model.phy.M0.ees        =   1;          %
+
+Model.phy.vasc.Hct      =   0.4;        % Hematocrit rate (%)
+Model.phy.vasc.Y        =   0.6;        	% Oxygenation saturation (%)
+Model.phy.vasc.khi0     =   0.264e-6;   % (ppm cgs)
+Model.phy.vasc.T1       =   1117e-3;    % (s) Can be Inf
+Model.phy.vasc.T2       =   30e-3;      % (s) Can be Inf
+
+Model.phy.cell.khi      =   0;          % (ppm cgs)
+Model.phy.cell.T1       =   1300e-3;    % (s) Can be Inf
+Model.phy.cell.T2       =   130e-3;     % (s) Can be Inf
+
+Model.phy.ees.khi       =   0;          % (ppm cgs)
+Model.phy.ees.T1        =   1300e-3;    % (s) Can be Inf
+Model.phy.ees.T2        =   1000e-3;    % (s) Can be Inf
+
+Model.phy.CA.r1         =   3.3;        % T1 relaxivity rate of CA(/mM/s-1)
+Model.phy.CA.r2         =   4.1;        % T2 relaxivity rate of CA(/mM/s-1)
+Model.phy.CA.D          =   48.5e-11;   % Diffusivity of CA (m2/s)     D0 = 4.6e-11, Dfree = 48.5e-11 
+Model.phy.CA.k          =   4.8e-3;     % Permeability of the vessel wall to CA (/s)
+Model.phy.CA.khi_mol    =   2.7e-8*4*pi;% Mag Susceptibility of the CA(/mM)
+
+%% AIF
+Model.AIF.mode          =   'slow';     % mode 'step', 'slow', 'fast' (1st pass type), 'mix' (1st pass + slow), 'dirac', 'ladder'
+Model.AIF.Ta            =   0;          % Arrival time (s). Might be an array in 'ladder' mode
+Model.AIF.Cpic          =   2.7;        % Peak concentrtion (mM). Might be an array in 'ladder' mode
+Model.AIF.F             =   0.01;       % (faction of the voxel of the voxel renewed /s)
+
+
+####################
+##    Sequence    ##
+####################
+
+% GRE Grad RF Spoiled
+Seq.Id          	=   'RF Spoiled';
+Seq.Name        	=   '@Seq_RFspoil';
+Seq.Tacq        	=   5*1e-3;
+Seq.TR          	=   20e-3;
+Seq.RF.exc.time 	=   [0]*1e-3;
+Seq.RF.exc.ang  	=   [8];
+Seq.RF.exc.pha  	=   [0];
+Seq.Spoil.Grad.dur  	= 	0.5e-3; % s
+Seq.Spoil.Grad.A    	=   2;          % Dephasing factor (1: gradient is 0-2pi over voxel, 2: 0-4pi, etc...)
+Seq.Spoil.RF.phainc	=   117;	% RF phase increment (deg)
